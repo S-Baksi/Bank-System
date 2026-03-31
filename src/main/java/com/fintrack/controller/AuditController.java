@@ -3,7 +3,6 @@ package com.fintrack.controller;
 import com.fintrack.dto.AuditLogDTO;
 import com.fintrack.entity.AuditLog;
 import com.fintrack.service.audit.AuditLogService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -15,8 +14,11 @@ import java.util.List;
 @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
 public class AuditController {
 
-    @Autowired
-    private AuditLogService auditLogService;
+    private final AuditLogService auditLogService;
+
+    public AuditController(AuditLogService auditLogService) {
+        this.auditLogService = auditLogService;
+    }
 
     @GetMapping("/logs")
     public ResponseEntity<List<AuditLogDTO>> getAllAuditLogs(@RequestParam(defaultValue = "0") int page,

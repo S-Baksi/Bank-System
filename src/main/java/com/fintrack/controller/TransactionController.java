@@ -3,7 +3,6 @@ package com.fintrack.controller;
 import com.fintrack.dto.TransactionDTO;
 import com.fintrack.entity.Transaction;
 import com.fintrack.service.TransactionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,8 +13,11 @@ import java.util.List;
 @RequestMapping("/api/v1/transactions")
 public class TransactionController {
 
-    @Autowired
-    private TransactionService transactionService;
+    private final TransactionService transactionService;
+
+    public TransactionController(TransactionService transactionService) {
+        this.transactionService = transactionService;
+    }
 
     @PostMapping("/transfer")
     public ResponseEntity<TransactionDTO> transferFunds(@RequestBody TransactionDTO.TransferRequest request) {

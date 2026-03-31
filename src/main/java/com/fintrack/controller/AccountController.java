@@ -6,7 +6,6 @@ import com.fintrack.entity.User;
 import com.fintrack.exception.ResourceNotFoundException;
 import com.fintrack.service.AccountService;
 import com.fintrack.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,11 +18,13 @@ import java.util.List;
 @RequestMapping("/api/v1/accounts")
 public class AccountController {
 
-    @Autowired
-    private AccountService accountService;
+    private final AccountService accountService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public AccountController(AccountService accountService, UserService userService) {
+        this.accountService = accountService;
+        this.userService = userService;
+    }
 
     @PostMapping
     public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO.CreateRequest request, Authentication authentication) {

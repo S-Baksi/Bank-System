@@ -3,7 +3,6 @@ package com.fintrack.service.audit;
 import com.fintrack.entity.AuditLog;
 import com.fintrack.entity.User;
 import com.fintrack.repository.AuditLogRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -14,8 +13,11 @@ import java.util.List;
 @Service
 public class AuditLogService {
 
-    @Autowired
-    private AuditLogRepository auditLogRepository;
+    private final AuditLogRepository auditLogRepository;
+
+    public AuditLogService(AuditLogRepository auditLogRepository) {
+        this.auditLogRepository = auditLogRepository;
+    }
 
     public AuditLog logAction(User user, String action, String entityType, Long entityId,
                               String beforeValue, String afterValue, String ipAddress, String userAgent) {

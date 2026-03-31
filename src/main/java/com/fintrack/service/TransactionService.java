@@ -6,7 +6,6 @@ import com.fintrack.exception.InsufficientFundsException;
 import com.fintrack.exception.InvalidTransactionException;
 import com.fintrack.repository.BankAccountRepository;
 import com.fintrack.repository.TransactionRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,13 +17,15 @@ import java.util.UUID;
 @Service
 public class TransactionService {
 
-    @Autowired
-    private TransactionRepository transactionRepository;
-
-    @Autowired
-    private BankAccountRepository bankAccountRepository;
+    private final TransactionRepository transactionRepository;
+    private final BankAccountRepository bankAccountRepository;
 
     private static final BigDecimal TRANSACTION_FEE = new BigDecimal("0.50");
+
+    public TransactionService(TransactionRepository transactionRepository, BankAccountRepository bankAccountRepository) {
+        this.transactionRepository = transactionRepository;
+        this.bankAccountRepository = bankAccountRepository;
+    }
 
     @Transactional
     public Transaction transferFunds(Long fromAccountId, Long toAccountId, BigDecimal amount, String description) {

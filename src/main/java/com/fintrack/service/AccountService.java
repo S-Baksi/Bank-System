@@ -4,7 +4,6 @@ import com.fintrack.entity.BankAccount;
 import com.fintrack.entity.User;
 import com.fintrack.exception.ResourceNotFoundException;
 import com.fintrack.repository.BankAccountRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,8 +15,11 @@ import java.util.Locale;
 @Service
 public class AccountService {
 
-    @Autowired
-    private BankAccountRepository bankAccountRepository;
+    private final BankAccountRepository bankAccountRepository;
+
+    public AccountService(BankAccountRepository bankAccountRepository) {
+        this.bankAccountRepository = bankAccountRepository;
+    }
 
     @Transactional
     public BankAccount createAccount(User user, String accountName, String accountType, BigDecimal initialBalance) {
