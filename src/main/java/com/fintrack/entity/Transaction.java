@@ -1,7 +1,7 @@
 package com.fintrack.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
     @Index(name = "idx_transaction_date", columnList = "transactionDate"),
     @Index(name = "idx_type", columnList = "type")
 })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -68,6 +67,9 @@ public class Transaction {
     @Column(length = 500)
     private String failureReason;
 
+    public Transaction() {
+    }
+
     @PrePersist
     protected void onCreate() {
         transactionDate = LocalDateTime.now();
@@ -78,6 +80,134 @@ public class Transaction {
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public BankAccount getFromAccount() {
+        return fromAccount;
+    }
+
+    public void setFromAccount(BankAccount fromAccount) {
+        this.fromAccount = fromAccount;
+    }
+
+    public BankAccount getToAccount() {
+        return toAccount;
+    }
+
+    public void setToAccount(BankAccount toAccount) {
+        this.toAccount = toAccount;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public BigDecimal getTransactionFee() {
+        return transactionFee;
+    }
+
+    public void setTransactionFee(BigDecimal transactionFee) {
+        this.transactionFee = transactionFee;
+    }
+
+    public String getBeneficiaryName() {
+        return beneficiaryName;
+    }
+
+    public void setBeneficiaryName(String beneficiaryName) {
+        this.beneficiaryName = beneficiaryName;
+    }
+
+    public String getBeneficiaryDetails() {
+        return beneficiaryDetails;
+    }
+
+    public void setBeneficiaryDetails(String beneficiaryDetails) {
+        this.beneficiaryDetails = beneficiaryDetails;
+    }
+
+    public TransactionType getType() {
+        return type;
+    }
+
+    public void setType(TransactionType type) {
+        this.type = type;
+    }
+
+    public TransactionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TransactionStatus status) {
+        this.status = status;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(String referenceNumber) {
+        this.referenceNumber = referenceNumber;
+    }
+
+    public LocalDateTime getTransactionDate() {
+        return transactionDate;
+    }
+
+    public void setTransactionDate(LocalDateTime transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public LocalDateTime getCompletedDate() {
+        return completedDate;
+    }
+
+    public void setCompletedDate(LocalDateTime completedDate) {
+        this.completedDate = completedDate;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+    public void setFailureReason(String failureReason) {
+        this.failureReason = failureReason;
     }
 
     public enum TransactionType { TRANSFER, DEPOSIT, WITHDRAWAL, BILL_PAYMENT, CHEQUE_DEPOSIT, INTEREST, CHARGE, REVERSAL }

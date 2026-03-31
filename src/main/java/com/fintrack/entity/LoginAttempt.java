@@ -1,7 +1,7 @@
 package com.fintrack.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
     @Index(name = "idx_user_id", columnList = "user_id"),
     @Index(name = "idx_attempt_time", columnList = "attemptTime")
 })
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class LoginAttempt {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,8 +36,75 @@ public class LoginAttempt {
     @Column(length = 500)
     private String failureReason;
 
+    public LoginAttempt() {
+    }
+
     @PrePersist
     protected void onCreate() {
         attemptTime = LocalDateTime.now();
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Boolean getSuccessful() {
+        return successful;
+    }
+
+    public void setSuccessful(Boolean successful) {
+        this.successful = successful;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
+    public LocalDateTime getAttemptTime() {
+        return attemptTime;
+    }
+
+    public void setAttemptTime(LocalDateTime attemptTime) {
+        this.attemptTime = attemptTime;
+    }
+
+    public Boolean getMfaCompleted() {
+        return mfaCompleted;
+    }
+
+    public void setMfaCompleted(Boolean mfaCompleted) {
+        this.mfaCompleted = mfaCompleted;
+    }
+
+    public String getFailureReason() {
+        return failureReason;
+    }
+
+    public void setFailureReason(String failureReason) {
+        this.failureReason = failureReason;
     }
 }
