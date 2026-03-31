@@ -1,4 +1,3 @@
-// File: src/main/java/com/fintrack/controller/AccountController.java
 package com.fintrack.controller;
 
 import com.fintrack.dto.AccountDTO;
@@ -10,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -20,45 +21,38 @@ public class AccountController {
     private AccountService accountService;
 
     @PostMapping
-    public ResponseEntity<?> createAccount(@RequestBody AccountDTO.CreateRequest request, Authentication authentication) {
-        try {
-            User user = (User) authentication.getPrincipal();
-            BankAccount account = accountService.createAccount(user, request.getAccountName(), request.getAccountType(), request.getInitialBalance());
-            return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(account));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse("Account creation failed"));
-        }
+    public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO.CreateRequest request, Authentication authentication) {
+        User user = getAuthenticatedUser(authentication);
+        BankAccount account = accountService.createAccount(
+                user,
+                request.getAccountName(),
+                request.getAccountType(),
+                request.getInitialBalance()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(convertToDTO(account));
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllAccounts(Authentication authentication) {
-        try {
-            User user = (User) authentication.getPrincipal();
-            List<BankAccount> accounts = accountService.getUserAccounts(user);
-            return ResponseEntity.ok(accounts.stream().map(this::convertToDTO).toList());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("Failed to fetch accounts"));
-        }
+    public ResponseEntity<List<AccountDTO>> getAllAccounts(Authentication authentication) {
+        User user = getAuthenticatedUser(authentication);
+        List<AccountDTO> accounts = accountService.getUserAccounts(user).stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(accounts);
     }
 
     @GetMapping("/{accountId}")
-    public ResponseEntity<?> getAccount(@PathVariable Long accountId, Authentication authentication) {
-        try {
-            BankAccount account = accountService.getAccountById(accountId);
-            return ResponseEntity.ok(convertToDTO(account));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Account not found"));
-        }
+    public ResponseEntity<AccountDTO> getAccount(@PathVariable Long accountId) {
+        return ResponseEntity.ok(convertToDTO(accountService.getAccountById(accountId)));
     }
 
     @GetMapping("/{accountId}/balance")
-    public ResponseEntity<?> getBalance(@PathVariable Long accountId, Authentication authentication) {
-        try {
-            BankAccount account = accountService.getAccountById(accountId);
-            return ResponseEntity.ok(new BalanceResponse(account.getBalance()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("Account not found"));
-        }
+    public ResponseEntity<BalanceResponse> getBalance(@PathVariable Long accountId) {
+        return ResponseEntity.ok(new BalanceResponse(accountService.getAccountBalance(accountId)));
+    }
+
+    private User getAuthenticatedUser(Authentication authentication) {
+        return (User) authentication.getPrincipal();
     }
 
     private AccountDTO convertToDTO(BankAccount account) {
@@ -66,20 +60,22 @@ public class AccountController {
                 .id(account.getId())
                 .accountNumber(account.getAccountNumber())
                 .accountName(account.getAccountName())
-                .accountType(account.getAccountType().toString())
+                .accountType(account.getAccountType().name())
                 .balance(account.getBalance())
-                .status(account.getStatus().toString())
+                .status(account.getStatus().name())
                 .verified(account.getVerified())
                 .build();
     }
 
-    public static class ErrorResponse {
-        public String error;
-        public ErrorResponse(String error) { this.error = error; }
-    }
-
     public static class BalanceResponse {
-        public Object balance;
-        public BalanceResponse(Object balance) { this.balance = balance; }
+        private final BigDecimal balance;
+
+        public BalanceResponse(BigDecimal balance) {
+            this.balance = balance;
+        }
+
+        public BigDecimal getBalance() {
+            return balance;
+        }
     }
 }

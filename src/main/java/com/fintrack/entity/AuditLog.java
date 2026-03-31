@@ -52,6 +52,7 @@ public class AuditLog {
     private String failureReason;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean success = true;
 
     @PrePersist

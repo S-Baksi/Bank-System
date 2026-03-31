@@ -44,18 +44,23 @@ public class User implements UserDetails {
     private Role role;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean accountNonExpired = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean accountNonLocked = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean credentialsNonExpired = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean enabled = true;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean mfaEnabled = false;
 
     @Column(length = 255)
@@ -79,12 +84,15 @@ public class User implements UserDetails {
     }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<BankAccount> accounts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<AuditLog> auditLogs = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<LoginAttempt> loginAttempts = new ArrayList<>();
 
     @Override

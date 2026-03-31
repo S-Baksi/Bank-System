@@ -1,7 +1,6 @@
-// File: src/main/java/com/fintrack/dto/AuditLogDTO.java
 package com.fintrack.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public class AuditLogDTO {
     private Long id;
@@ -13,7 +12,7 @@ public class AuditLogDTO {
     private String afterValue;
     private String ipAddress;
     private String userAgent;
-    private Date timestamp;
+    private LocalDateTime timestamp;
     private Boolean success;
 
     public Long getId() { return id; }
@@ -34,8 +33,8 @@ public class AuditLogDTO {
     public void setIpAddress(String ipAddress) { this.ipAddress = ipAddress; }
     public String getUserAgent() { return userAgent; }
     public void setUserAgent(String userAgent) { this.userAgent = userAgent; }
-    public Date getTimestamp() { return timestamp; }
-    public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
     public Boolean getSuccess() { return success; }
     public void setSuccess(Boolean success) { this.success = success; }
 }

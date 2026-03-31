@@ -1,12 +1,14 @@
-// File: src/main/java/com/fintrack/service/AccountService.java
 package com.fintrack.service;
 
 import com.fintrack.entity.BankAccount;
 import com.fintrack.entity.User;
+import com.fintrack.exception.ResourceNotFoundException;
 import com.fintrack.repository.BankAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,7 +33,8 @@ public class AccountService {
     }
 
     public BankAccount getAccountById(Long id) {
-        return bankAccountRepository.findById(id).orElseThrow(() -> new RuntimeException("Account not found"));
+        return bankAccountRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Account not found with id " + id));
     }
 
     public List<BankAccount> getUserAccounts(User user) {
@@ -40,17 +43,22 @@ public class AccountService {
 
     public BankAccount updateAccount(Long accountId, String accountName, BankAccount.AccountStatus status) {
         BankAccount account = getAccountById(accountId);
-        if (accountName != null) account.setAccountName(accountName);
-        if (status != null) account.setStatus(status);
+        if (accountName != null && !accountName.isBlank()) {
+            account.setAccountName(accountName);
+        }
+        if (status != null) {
+            account.setStatus(status);
+        }
         return bankAccountRepository.save(account);
     }
 
     public void closeAccount(Long accountId) {
         BankAccount account = getAccountById(accountId);
         if (account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
-            throw new RuntimeException("Cannot close account with remaining balance");
+            throw new IllegalArgumentException("Cannot close account with remaining balance");
         }
         account.setStatus(BankAccount.AccountStatus.CLOSED);
+        account.setClosedAt(LocalDateTime.now());
         bankAccountRepository.save(account);
     }
 

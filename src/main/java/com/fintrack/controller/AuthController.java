@@ -1,4 +1,3 @@
-// File: src/main/java/com/fintrack/controller/AuthController.java
 package com.fintrack.controller;
 
 import com.fintrack.dto.LoginRequest;
@@ -27,46 +26,43 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
-        try {
-            User user = userService.registerUser(request.getUsername(), request.getEmail(), request.getPassword(), "CUSTOMER");
-            return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("User registered successfully", user.getId()));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ApiResponse("Registration failed", null));
-        }
+    public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequest request) {
+        User user = userService.registerUser(
+                request.getUsername(),
+                request.getEmail(),
+                request.getPassword(),
+                request.getFirstName(),
+                request.getLastName(),
+                request.getPhone(),
+                "CUSTOMER"
+        );
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new ApiResponse("User registered successfully", user.getId()));
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        try {
-            User user = userService.findByUsername(request.getUsername())
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userService.findByUsername(request.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid credentials", null));
-            }
-
-            String token = jwtTokenProvider.generateToken(user.getUsername());
-            String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
-
-            return ResponseEntity.ok(new LoginResponse(token, refreshToken, "Bearer", 86400000L, user.getUsername()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Authentication failed", null));
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid credentials", null));
         }
+
+        String token = jwtTokenProvider.generateToken(user.getUsername());
+        String refreshToken = jwtTokenProvider.generateRefreshToken(user.getUsername());
+        return ResponseEntity.ok(new LoginResponse(token, refreshToken, "Bearer", 86400000L, user.getUsername()));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestParam String refreshToken) {
-        try {
-            if (jwtTokenProvider.validateToken(refreshToken)) {
-                String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
-                String newToken = jwtTokenProvider.generateToken(username);
-                return ResponseEntity.ok(new LoginResponse(newToken, refreshToken, "Bearer", 86400000L, username));
-            }
-        } catch (Exception e) {
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid refresh token", null));
         }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Unauthorized", null));
+
+        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+        String newToken = jwtTokenProvider.generateToken(username);
+        return ResponseEntity.ok(new LoginResponse(newToken, refreshToken, "Bearer", 86400000L, username));
     }
 
     public static class ApiResponse {

@@ -51,6 +51,7 @@ public class BankAccount {
     private AccountStatus status;
 
     @Column(nullable = false)
+    @Builder.Default
     private Boolean verified = false;
 
     @Column(nullable = false)
