@@ -69,7 +69,7 @@ public class AccountController {
                 .accountType(account.getAccountType().toString())
                 .balance(account.getBalance())
                 .status(account.getStatus().toString())
-                .verified(account.isVerified())
+                .verified(account.getVerified())
                 .build();
     }
 

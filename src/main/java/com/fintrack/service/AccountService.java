@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 public class AccountService {
@@ -15,11 +16,11 @@ public class AccountService {
     @Autowired
     private BankAccountRepository bankAccountRepository;
 
-    public BankAccount createAccount(User user, String accountName, BankAccount.AccountType accountType, BigDecimal initialBalance) {
+    public BankAccount createAccount(User user, String accountName, String accountType, BigDecimal initialBalance) {
         BankAccount account = new BankAccount();
         account.setUser(user);
         account.setAccountName(accountName);
-        account.setAccountType(accountType);
+        account.setAccountType(BankAccount.AccountType.valueOf(accountType.toUpperCase(Locale.ROOT)));
         account.setBalance(initialBalance != null ? initialBalance : BigDecimal.ZERO);
         account.setAccountNumber("ACC" + System.currentTimeMillis());
         account.setIban("DE" + System.currentTimeMillis());
@@ -49,7 +50,7 @@ public class AccountService {
         if (account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
             throw new RuntimeException("Cannot close account with remaining balance");
         }
-        account.setStatus(BankAccount.AccountStatus.INACTIVE);
+        account.setStatus(BankAccount.AccountStatus.CLOSED);
         bankAccountRepository.save(account);
     }
 
@@ -71,7 +72,7 @@ public class AccountService {
 
     public void suspendAccount(Long accountId, String reason) {
         BankAccount account = getAccountById(accountId);
-        account.setStatus(BankAccount.AccountStatus.FROZEN);
+        account.setStatus(BankAccount.AccountStatus.SUSPENDED);
         bankAccountRepository.save(account);
     }
 }

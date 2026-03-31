@@ -22,7 +22,7 @@ public class UserService {
         user.setUsername(username);
         user.setEmail(email);
         user.setPassword(passwordEncoder.encode(password));
-        user.setRole(role);
+        user.setRole(User.Role.valueOf(role.toUpperCase()));
         user.setMfaEnabled(false);
         return userRepository.save(user);
     }
@@ -46,12 +46,14 @@ public class UserService {
     public void enableMFA(Long userId, String secret) {
         User user = getUserById(userId);
         user.setMfaEnabled(true);
+        user.setMfaSecret(secret);
         userRepository.save(user);
     }
 
     public void disableMFA(Long userId) {
         User user = getUserById(userId);
         user.setMfaEnabled(false);
+        user.setMfaSecret(null);
         userRepository.save(user);
     }
 }

@@ -13,6 +13,7 @@ import java.util.List;
 public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     List<AuditLog> findByUserOrderByTimestampDesc(User user);
     List<AuditLog> findByEntityTypeAndEntityIdOrderByTimestampDesc(String entityType, Long entityId);
+    List<AuditLog> findBySuccessFalseOrderByTimestampDesc();
     
     @Query("SELECT a FROM AuditLog a WHERE a.user.id = :userId AND a.timestamp BETWEEN :startDate AND :endDate")
     List<AuditLog> getUserAuditLogsBetweenDates(@Param("userId") Long userId, @Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
