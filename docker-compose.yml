@@ -1,23 +1,37 @@
+# File: docker-compose.yml
 version: '3.8'
 services:
   mysql:
     image: mysql:8.0
+    container_name: bank-system-mysql
     environment:
       MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: fintrack_db
+      MYSQL_DATABASE: bank_system_db
+      MYSQL_USER: bank_user
+      MYSQL_PASSWORD: bank_password
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
 
-  app:
+  bank-app:
     build: .
+    container_name: bank-system-app
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/fintrack_db
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/bank_system_db?useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: bank_user
+      SPRING_DATASOURCE_PASSWORD: bank_password
+      APP_JWT_SECRET: your-secure-secret-key-here
     ports:
       - "8080:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
 
 volumes:
   mysql_data:

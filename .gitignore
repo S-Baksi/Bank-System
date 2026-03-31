@@ -1,3 +1,4 @@
+# File: .gitignore
 target/
 .idea/
 .vscode/
@@ -7,3 +8,10 @@ target/
 logs/
 .DS_Store
 .env
+*.iml
+*.iws
+*.ipr
+dependency-reduced-pom.xml
+.classpath
+.project
+.settings/
