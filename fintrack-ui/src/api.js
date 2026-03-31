@@ -48,6 +48,11 @@ export const transactionApi = {
   getHistory: (accountId) => api.get(`/transactions/account/${accountId}`),
 };
 
+// ── User / Profile ──
+export const userApi = {
+  getProfile: () => api.get('/auth/me'),
+};
+
 // ── Audit ──
 export const auditApi = {
   getLogs: (page = 0, size = 50) => api.get(`/audit/logs?page=${page}&size=${size}`),
