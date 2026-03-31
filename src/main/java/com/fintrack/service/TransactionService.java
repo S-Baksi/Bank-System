@@ -8,6 +8,7 @@ import com.fintrack.repository.BankAccountRepository;
 import com.fintrack.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class TransactionService {
 
     private static final BigDecimal TRANSACTION_FEE = new BigDecimal("0.50");
 
+    @Transactional
     public Transaction transferFunds(Long fromAccountId, Long toAccountId, BigDecimal amount, String description) {
         validatePositiveAmount(amount);
 
@@ -56,6 +58,7 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
+    @Transactional
     public Transaction deposit(Long accountId, BigDecimal amount, String description) {
         validatePositiveAmount(amount);
 
@@ -77,6 +80,7 @@ public class TransactionService {
         return transactionRepository.save(transaction);
     }
 
+    @Transactional
     public Transaction withdrawal(Long accountId, BigDecimal amount, String description) {
         validatePositiveAmount(amount);
 
@@ -114,6 +118,7 @@ public class TransactionService {
         return transactionRepository.findByFromAccountOrToAccountOrderByTransactionDateDesc(account, account);
     }
 
+    @Transactional
     public Transaction reverseTransaction(Long transactionId) {
         Transaction transaction = getTransactionById(transactionId);
         if (!Transaction.TransactionStatus.COMPLETED.equals(transaction.getStatus())) {

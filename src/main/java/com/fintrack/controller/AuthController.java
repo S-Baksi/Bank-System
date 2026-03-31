@@ -25,6 +25,8 @@ public class AuthController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    private static final String INVALID_CREDENTIALS_MSG = "Invalid credentials";
+
     @PostMapping("/register")
     public ResponseEntity<ApiResponse> register(@RequestBody RegisterRequest request) {
         User user = userService.registerUser(
@@ -42,11 +44,11 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        User user = userService.findByUsername(request.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid credentials", null));
+        // Use same error message for both unknown user and wrong password to prevent username enumeration
+        User user = userService.findByUsername(request.getUsername()).orElse(null);
+        if (user == null || !passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse(INVALID_CREDENTIALS_MSG, null));
         }
 
         String token = jwtTokenProvider.generateToken(user.getUsername());
@@ -57,7 +59,8 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestParam String refreshToken) {
         if (!jwtTokenProvider.validateToken(refreshToken)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ApiResponse("Invalid refresh token", null));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ApiResponse("Invalid refresh token", null));
         }
 
         String username = jwtTokenProvider.getUsernameFromToken(refreshToken);

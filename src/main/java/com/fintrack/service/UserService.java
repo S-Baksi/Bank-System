@@ -37,7 +37,7 @@ public class UserService {
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPhone(phone);
-        user.setRole(User.Role.valueOf(role.toUpperCase()));
+        user.setRole(User.Role.valueOf(role.toUpperCase(java.util.Locale.ROOT)));
         user.setMfaEnabled(false);
         return userRepository.save(user);
     }

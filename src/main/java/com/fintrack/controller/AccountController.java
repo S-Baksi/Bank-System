@@ -3,7 +3,9 @@ package com.fintrack.controller;
 import com.fintrack.dto.AccountDTO;
 import com.fintrack.entity.BankAccount;
 import com.fintrack.entity.User;
+import com.fintrack.exception.ResourceNotFoundException;
 import com.fintrack.service.AccountService;
+import com.fintrack.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,9 @@ public class AccountController {
 
     @Autowired
     private AccountService accountService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping
     public ResponseEntity<AccountDTO> createAccount(@RequestBody AccountDTO.CreateRequest request, Authentication authentication) {
@@ -52,7 +57,9 @@ public class AccountController {
     }
 
     private User getAuthenticatedUser(Authentication authentication) {
-        return (User) authentication.getPrincipal();
+        String username = authentication.getName();
+        return userService.findByUsername(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Authenticated user not found: " + username));
     }
 
     private AccountDTO convertToDTO(BankAccount account) {

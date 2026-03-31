@@ -4,6 +4,8 @@ import com.fintrack.entity.AuditLog;
 import com.fintrack.entity.User;
 import com.fintrack.repository.AuditLogRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,7 +17,8 @@ public class AuditLogService {
     @Autowired
     private AuditLogRepository auditLogRepository;
 
-    public AuditLog logAction(User user, String action, String entityType, Long entityId, String beforeValue, String afterValue, String ipAddress, String userAgent) {
+    public AuditLog logAction(User user, String action, String entityType, Long entityId,
+                              String beforeValue, String afterValue, String ipAddress, String userAgent) {
         AuditLog auditLog = new AuditLog();
         auditLog.setUser(user);
         auditLog.setAction(action);
@@ -43,18 +46,14 @@ public class AuditLogService {
     }
 
     public List<AuditLog> getAllAuditLogs(int page, int size) {
-        return paginate(auditLogRepository.findAll(), page, size);
+        return auditLogRepository.findAll(
+                PageRequest.of(Math.max(page, 0), Math.max(size, 1), Sort.by(Sort.Direction.DESC, "timestamp"))
+        ).getContent();
     }
 
     public List<AuditLog> getFailedActions(int page, int size) {
-        return paginate(auditLogRepository.findBySuccessFalseOrderByTimestampDesc(), page, size);
-    }
-
-    private List<AuditLog> paginate(List<AuditLog> auditLogs, int page, int size) {
-        int safePage = Math.max(page, 0);
-        int safeSize = Math.max(size, 1);
-        int fromIndex = Math.min(safePage * safeSize, auditLogs.size());
-        int toIndex = Math.min(fromIndex + safeSize, auditLogs.size());
-        return auditLogs.subList(fromIndex, toIndex);
+        return auditLogRepository.findBySuccessFalse(
+                PageRequest.of(Math.max(page, 0), Math.max(size, 1), Sort.by(Sort.Direction.DESC, "timestamp"))
+        ).getContent();
     }
 }

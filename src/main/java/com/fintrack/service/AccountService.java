@@ -6,6 +6,7 @@ import com.fintrack.exception.ResourceNotFoundException;
 import com.fintrack.repository.BankAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,6 +19,7 @@ public class AccountService {
     @Autowired
     private BankAccountRepository bankAccountRepository;
 
+    @Transactional
     public BankAccount createAccount(User user, String accountName, String accountType, BigDecimal initialBalance) {
         BankAccount account = new BankAccount();
         account.setUser(user);
@@ -41,6 +43,7 @@ public class AccountService {
         return bankAccountRepository.findByUser(user);
     }
 
+    @Transactional
     public BankAccount updateAccount(Long accountId, String accountName, BankAccount.AccountStatus status) {
         BankAccount account = getAccountById(accountId);
         if (accountName != null && !accountName.isBlank()) {
@@ -52,6 +55,7 @@ public class AccountService {
         return bankAccountRepository.save(account);
     }
 
+    @Transactional
     public void closeAccount(Long accountId) {
         BankAccount account = getAccountById(accountId);
         if (account.getBalance().compareTo(BigDecimal.ZERO) > 0) {
@@ -66,18 +70,21 @@ public class AccountService {
         return getAccountById(accountId).getBalance();
     }
 
+    @Transactional
     public void updateBalance(Long accountId, BigDecimal amount) {
         BankAccount account = getAccountById(accountId);
         account.setBalance(account.getBalance().add(amount));
         bankAccountRepository.save(account);
     }
 
+    @Transactional
     public void verifyAccount(Long accountId) {
         BankAccount account = getAccountById(accountId);
         account.setVerified(true);
         bankAccountRepository.save(account);
     }
 
+    @Transactional
     public void suspendAccount(Long accountId, String reason) {
         BankAccount account = getAccountById(accountId);
         account.setStatus(BankAccount.AccountStatus.SUSPENDED);
