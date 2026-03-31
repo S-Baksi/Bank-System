@@ -5,6 +5,7 @@ import com.fintrack.exception.ResourceNotFoundException;
 import com.fintrack.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -23,6 +24,7 @@ public class UserService {
         return registerUser(username, email, password, null, null, null, role);
     }
 
+    @Transactional
     public User registerUser(String username, String email, String password, String firstName, String lastName, String phone, String role) {
         if (userRepository.existsByUsername(username)) {
             throw new IllegalArgumentException("Username already exists");
